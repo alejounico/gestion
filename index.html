@@ -1,1 +1,925 @@
+<html><head><base href="." /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Gestión de Personas y Usuarios</title>
+<style>
+:root {
+    --primary: #2c3e50;
+    --secondary: #34495e;
+    --success: #27ae60;
+    --danger: #c0392b;
+    --light: #ecf0f1;
+    --info: #3498db;
+}
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: #f5f6fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background: var(--primary);
+    color: white;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-success {
+    background: var(--success);
+    color: white;
+}
+
+.badge-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.badge-info {
+    background: var(--info);
+    color: white;
+}
+
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-container {
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--secondary);
+}
+
+.tab-button.active {
+    border-bottom: 3px solid var(--primary);
+    color: var(--primary);
+}
+
+.animate-fade {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.login-card {
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.logged-user {
+    color: white;
+    text-align: right;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.photo-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#photoPreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 10px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    color: var(--secondary);
+    font-size: 0.9em;
+    border-top: 1px solid #ddd;
+}
+
+.refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    min-width: 40px;
+}
+
+.refresh-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.refresh-btn:hover svg {
+    transform: rotate(180deg);
+}
+</style>
+</head>
+<body>
+    <div id="loginPage" class="container">
+        <div class="card login-card" style="max-width: 400px; margin: 100px auto;">
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Usuario</label>
+                    <input type="text" id="loginUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <img src="https://www.icardcolombia.com/wp-content/uploads/2023/07/logo-blanco.png.webp" 
+                         alt="iCard Colombia logo" 
+                         class="header-logo"
+                         width="150" 
+                         height="45">
+                    <h1>Sistema de Gestión de Personas y Usuarios</h1>
+                </div>
+                <div class="logged-user" id="loggedUserInfo"></div>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="tab-container">
+                <button class="tab-button active" onclick="showTab('create')">Crear Persona</button>
+                <button class="tab-button" onclick="showTab('list')">Lista de Personas</button>
+                <button class="tab-button" onclick="showTab('users')">Gestión de Usuarios</button>
+            </div>
+
+            <div id="createTab" class="card animate-fade">
+                <h2>Registro de Nueva Persona</h2>
+                <form id="personForm" onsubmit="createPerson(event)">
+                    <div class="form-group">
+                        <label for="code">Código</label>
+                        <input type="text" id="code" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cedula">Cédula</label>
+                        <input type="text" id="cedula" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Nombre</label>
+                        <input type="text" id="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="photo">Foto</label>
+                        <input type="file" id="photo" class="form-control" accept="image/*" required onchange="showPhotoPreview(this)">
+                        <img id="photoPreview" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado</label>
+                        <select id="status" class="form-control" required>
+                            <option value="active">Activo</option>
+                            <option value="inactive">Inactivo</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+
+            <div id="listTab" class="card animate-fade" style="display: none;">
+                <h2>Lista de Personas</h2>
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="form-control" 
+                        placeholder="Buscar por código, nombre o cédula..."
+                        onkeypress="handleSearchKeyPress(event)"
+                        autocomplete="off"
+                    >
+                    <button class="btn btn-primary" onclick="searchPeople()">Buscar</button>
+                    <button class="btn btn-primary refresh-btn" onclick="refreshPeopleList()" title="Actualizar lista">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 3a5 5 0 0 0-5 5H2a1 1 0 0 0-1 1v.5a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a3 3 0 0 1 3-3a3 3 0 0 1 3 3a3 3 0 0 1-3 3a1 1 0 0 0 0 2a5 5 0 0 0 0-10z"/>
+                        </svg>
+                    </button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Cédula</th>
+                            <th>Nombre</th>
+                            <th>Foto</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="peopleList"></tbody>
+                </table>
+            </div>
+
+            <div id="usersTab" class="card animate-fade" style="display: none;">
+                <h2>Gestión de Usuarios</h2>
+                <form id="userForm" onsubmit="createUser(event)">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyName">Nombre de Empresa</label>
+                        <input type="text" id="companyName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nit">NIT</label>
+                        <input type="text" id="nit" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Rol</label>
+                        <select id="role" class="form-control" required>
+                            <option value="admin">Administrador</option>
+                            <option value="viewer">Visualizador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                </form>
+
+                <h3 class="mt-4">Lista de Usuarios</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Empresa</th>
+                            <th>NIT</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="footer">
+            Powered by iCard 2024
+        </footer>
+
+        <script>
+class StorageManager {
+    constructor() {
+        this.peopleKey = 'people';
+        this.usersKey = 'users';
+    }
+
+    getPeople() {
+        const people = localStorage.getItem(this.peopleKey);
+        return people ? JSON.parse(people) : [];
+    }
+
+    savePeople(people) {
+        localStorage.setItem(this.peopleKey, JSON.stringify(people));
+    }
+
+    getUsers() {
+        const users = localStorage.getItem(this.usersKey);
+        return users ? JSON.parse(users) : [];
+    }
+
+    saveUsers(users) {
+        localStorage.setItem(this.usersKey, JSON.stringify(users));
+    }
+}
+
+class PeopleManager {
+    constructor() {
+        this.storage = new StorageManager();
+    }
+
+    addPerson(person) {
+        const people = this.storage.getPeople();
+        if (people.some(p => p.code === person.code)) {
+            throw new Error('El código ya existe');
+        }
+        people.push(person);
+        this.storage.savePeople(people);
+    }
+
+    getPeople() {
+        return this.storage.getPeople();
+    }
+
+    searchPeople(query) {
+        const people = this.storage.getPeople();
+        const searchQuery = query.toLowerCase().trim();
+        
+        if (!searchQuery) {
+            return people;
+        }
+
+        return people.filter(person => {
+            const code = person.code ? person.code.toLowerCase() : '';
+            const name = person.name ? person.name.toLowerCase() : '';
+            const cedula = person.cedula ? person.cedula.toLowerCase() : '';
+            
+            return code.includes(searchQuery) || 
+                   name.includes(searchQuery) ||
+                   cedula.includes(searchQuery);
+        });
+    }
+
+    deletePerson(code) {
+        let people = this.storage.getPeople();
+        people = people.filter(person => person.code !== code);
+        this.storage.savePeople(people);
+    }
+
+    toggleStatus(code) {
+        let people = this.storage.getPeople();
+        people = people.map(person => {
+            if (person.code === code) {
+                return {
+                    ...person,
+                    status: person.status === 'active' ? 'inactive' : 'active'
+                };
+            }
+            return person;
+        });
+        this.storage.savePeople(people);
+    }
+}
+
+class UserManager {
+    constructor() {
+        this.storage = new StorageManager();
+    }
+
+    addUser(user) {
+        const users = this.storage.getUsers();
+        if (users.some(u => u.username === user.username)) {
+            throw new Error('El usuario ya existe');
+        }
+        users.push({...user, status: 'active'});
+        this.storage.saveUsers(users);
+    }
+
+    getUsers() {
+        return this.storage.getUsers();
+    }
+
+    deleteUser(username) {
+        let users = this.storage.getUsers();
+        users = users.filter(user => user.username !== username);
+        this.storage.saveUsers(users);
+    }
+
+    toggleUserStatus(username) {
+        let users = this.storage.getUsers();
+        users = users.map(user => {
+            if (user.username === username) {
+                return {
+                    ...user,
+                    status: user.status === 'active' ? 'inactive' : 'active'
+                };
+            }
+            return user;
+        });
+        this.storage.saveUsers(users);
+    }
+
+    validateUser(username, password) {
+        const users = this.getUsers();
+        const user = users.find(u => u.username === username && u.password === password);
+        if (!user) {
+            throw new Error('Usuario o contraseña incorrectos');
+        }
+        if (user.status !== 'active') {
+            throw new Error('Usuario inactivo');
+        }
+        return user;
+    }
+
+    getCurrentUser() {
+        const userJson = sessionStorage.getItem('currentUser');
+        return userJson ? JSON.parse(userJson) : null;
+    }
+
+    setCurrentUser(user) {
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+    }
+
+    logout() {
+        sessionStorage.removeItem('currentUser');
+    }
+}
+
+const peopleManager = new PeopleManager();
+const userManager = new UserManager();
+
+let searchTimeout; // Declare searchTimeout globally
+
+function showTab(tabName) {
+    const currentUser = userManager.getCurrentUser();
+    
+    // Prevent viewers from accessing restricted tabs
+    if (currentUser.role === 'viewer' && (tabName === 'create' || tabName === 'users')) {
+        alert('No tiene permisos para acceder a esta sección');
+        return;
+    }
+    
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.display = 'none';
+    });
+
+    if (tabName === 'create') {
+        document.getElementById('createTab').style.display = 'block';
+        document.querySelector('[onclick="showTab(\'create\')"]').classList.add('active');
+    } else if (tabName === 'list') {
+        document.getElementById('listTab').style.display = 'block';
+        document.querySelector('[onclick="showTab(\'list\')"]').classList.add('active');
+        renderPeopleList();
+    } else if (tabName === 'users') {
+        document.getElementById('usersTab').style.display = 'block';
+        document.querySelector('[onclick="showTab(\'users\')"]').classList.add('active');
+        renderUsersList();
+    }
+}
+
+function createPerson(event) {
+    event.preventDefault();
+    
+    const code = document.getElementById('code').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const photoFile = document.getElementById('photo').files[0];
+    
+    if (!code || !cedula || !name || !photoFile) {
+        alert('Todos los campos son obligatorios');
+        return;
+    }
+
+    // Validate file size (max 5MB)
+    if (photoFile.size > 5 * 1024 * 1024) {
+        alert('La foto no debe exceder 5MB');
+        return;
+    }
+
+    // Validate file type
+    if (!photoFile.type.startsWith('image/')) {
+        alert('Por favor seleccione un archivo de imagen válido');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const person = {
+            code: code,
+            cedula: cedula,
+            name: name,
+            photo: e.target.result,
+            status: document.getElementById('status').value
+        };
+
+        try {
+            peopleManager.addPerson(person);
+            document.getElementById('personForm').reset();
+            document.getElementById('photoPreview').style.display = 'none';
+            alert('Persona creada exitosamente');
+            // Automatically show list after creation
+            showTab('list');
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+    reader.readAsDataURL(photoFile);
+}
+
+function renderPeopleList(people = null) {
+    const peopleToRender = people || peopleManager.getPeople();
+    const tbody = document.getElementById('peopleList');
+    tbody.innerHTML = '';
+    
+    const currentUser = userManager.getCurrentUser();
+    const isViewer = currentUser.role === 'viewer';
+    const isAdmin = currentUser.role === 'admin';
+
+    peopleToRender.forEach(person => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${person.code}</td>
+            <td>${person.cedula}</td>
+            <td>${person.name}</td>
+            <td><img src="${person.photo}" class="photo-thumbnail" alt="Foto de ${person.name}"></td>
+            <td>
+                <span class="badge badge-${person.status === 'active' ? 'success' : 'danger'}">
+                    ${person.status === 'active' ? 'Activo' : 'Inactivo'}
+                </span>
+            </td>
+            <td>
+                ${isViewer ? '' : `
+                    ${isAdmin ? `
+                        <button class="btn btn-primary" onclick="togglePersonStatus('${person.code}')">
+                            Cambiar Estado
+                        </button>
+                        <button class="btn btn-info" onclick="editPerson('${person.code}')">
+                            Editar
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-danger" onclick="deletePerson('${person.code}')">
+                        Eliminar
+                    </button>
+                `}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function editPerson(code) {
+    const people = peopleManager.getPeople();
+    const person = people.find(p => p.code === code);
+    
+    if (!person) {
+        alert('Persona no encontrada');
+        return;
+    }
+
+    // Pre-fill the create form with person data
+    document.getElementById('code').value = person.code;
+    document.getElementById('code').readOnly = true; // Prevent code modification
+    document.getElementById('cedula').value = person.cedula;
+    document.getElementById('name').value = person.name;
+    document.getElementById('status').value = person.status;
+    
+    // Show photo preview
+    document.getElementById('photoPreview').src = person.photo;
+    document.getElementById('photoPreview').style.display = 'block';
+    
+    // Make photo field optional for editing
+    document.getElementById('photo').removeAttribute('required');
+    
+    // Modify form submission handler temporarily
+    const form = document.getElementById('personForm');
+    form.onsubmit = (e) => updatePerson(e, person);
+    
+    // Switch to create tab
+    showTab('create');
+}
+
+function updatePerson(event, oldPerson) {
+    event.preventDefault();
+    
+    const code = document.getElementById('code').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const photoFile = document.getElementById('photo').files[0];
+    const status = document.getElementById('status').value;
+    
+    if (!code || !cedula || !name) {
+        alert('Los campos código, cédula y nombre son obligatorios');
+        return;
+    }
+
+    const updatePersonData = () => {
+        const people = peopleManager.getPeople();
+        const updatedPeople = people.map(p => {
+            if (p.code === code) {
+                return {
+                    ...p,
+                    cedula,
+                    name,
+                    status,
+                    photo: photoFile ? photoBase64 : p.photo
+                };
+            }
+            return p;
+        });
+        
+        localStorage.setItem('people', JSON.stringify(updatedPeople));
+        
+        // Reset form and handlers
+        document.getElementById('personForm').reset();
+        document.getElementById('code').readOnly = false;
+        document.getElementById('photo').setAttribute('required', 'required');
+        document.getElementById('photoPreview').style.display = 'none';
+        document.getElementById('personForm').onsubmit = createPerson;
+        
+        alert('Persona actualizada exitosamente');
+        showTab('list');
+    };
+
+    if (photoFile) {
+        // Validate file size (max 5MB)
+        if (photoFile.size > 5 * 1024 * 1024) {
+            alert('La foto no debe exceder 5MB');
+            return;
+        }
+
+        // Validate file type
+        if (!photoFile.type.startsWith('image/')) {
+            alert('Por favor seleccione un archivo de imagen válido');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            photoBase64 = e.target.result;
+            updatePersonData();
+        };
+        reader.readAsDataURL(photoFile);
+    } else {
+        updatePersonData();
+    }
+}
+
+function createUser(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const companyName = document.getElementById('companyName').value.trim();
+    const nit = document.getElementById('nit').value.trim();
+    
+    if (!username || !password || !companyName || !nit) {
+        alert('Todos los campos son obligatorios');
+        return;
+    }
+
+    if (password.length < 4) {
+        alert('La contraseña debe tener al menos 4 caracteres');
+        return;
+    }
+
+    const user = {
+        username,
+        password,
+        companyName,
+        nit,
+        role: document.getElementById('role').value
+    };
+
+    try {
+        userManager.addUser(user);
+        document.getElementById('userForm').reset();
+        alert('Usuario creado exitosamente');
+        renderUsersList();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function renderUsersList() {
+    const users = userManager.getUsers();
+    const tbody = document.getElementById('usersList');
+    tbody.innerHTML = '';
+
+    users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.username}</td>
+            <td>${user.companyName || '-'}</td>
+            <td>${user.nit || '-'}</td>
+            <td><span class="badge badge-info">${user.role}</span></td>
+            <td>
+                <span class="badge badge-${user.status === 'active' ? 'success' : 'danger'}">
+                    ${user.status === 'active' ? 'Activo' : 'Inactivo'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-primary" onclick="toggleUserStatus('${user.username}')">
+                    Cambiar Estado
+                </button>
+                <button class="btn btn-danger" onclick="deleteUser('${user.username}')">
+                    Eliminar
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function deleteUser(username) {
+    if(confirm('¿Está seguro de eliminar este usuario?')) {
+        userManager.deleteUser(username);
+        renderUsersList();
+    }
+}
+
+function toggleUserStatus(username) {
+    userManager.toggleUserStatus(username);
+    renderUsersList();
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const user = userManager.validateUser(username, password);
+        userManager.setCurrentUser(user);
+        document.getElementById('loginForm').reset();
+        showMainContent();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function showMainContent() {
+    const currentUser = userManager.getCurrentUser();
+    if (!currentUser) {
+        document.getElementById('loginPage').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    
+    // Hide tabs for viewer users
+    if (currentUser.role === 'viewer') {
+        document.querySelector('[onclick="showTab(\'create\')"]').style.display = 'none';
+        document.querySelector('[onclick="showTab(\'users\')"]').style.display = 'none';
+        // Automatically show list tab for viewers
+        showTab('list');
+    } else {
+        // Show all tabs for admin
+        document.querySelector('[onclick="showTab(\'create\')"]').style.display = 'inline-block';
+        document.querySelector('[onclick="showTab(\'users\')"]').style.display = 'inline-block';
+    }
+    
+    // Update logged user info
+    const loggedUserInfo = document.getElementById('loggedUserInfo');
+    loggedUserInfo.innerHTML = `
+        Usuario: ${currentUser.username} (${currentUser.role})
+        <button onclick="handleLogout()" class="btn btn-danger" style="margin-left: 10px;">
+            Cerrar Sesión
+        </button>
+    `;
+}
+
+function handleLogout() {
+    if(confirm('¿Está seguro que desea cerrar sesión?')) {
+        userManager.logout();
+        location.reload();
+    }
+}
+
+function togglePersonStatus(code) {
+    if(confirm('¿Está seguro de cambiar el estado de esta persona?')) {
+        peopleManager.toggleStatus(code);
+        // Refresh the list immediately after toggling status
+        renderPeopleList();
+    }
+}
+
+function deletePerson(code) {
+    if(confirm('¿Está seguro de eliminar esta persona?')) {
+        peopleManager.deletePerson(code);
+        renderPeopleList();
+    }
+}
+
+function searchPeople() {
+    const searchQuery = document.getElementById('searchInput').value;
+    const filteredPeople = peopleManager.searchPeople(searchQuery);
+    renderPeopleList(filteredPeople);
+}
+
+function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        searchPeople();
+    }
+}
+
+function refreshPeopleList() {
+    renderPeopleList();
+    // Add a subtle animation to the button
+    const refreshBtn = document.querySelector('.refresh-btn');
+    refreshBtn.style.transform = 'rotate(360deg)';
+    setTimeout(() => {
+        refreshBtn.style.transform = 'rotate(0)';
+    }, 300);
+}
+        </script>
+    </div>
+</body></html>
